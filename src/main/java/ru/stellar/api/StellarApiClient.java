@@ -1,11 +1,9 @@
 package ru.stellar.api;
 
-import com.google.gson.Gson;
+import io.qameta.allure.Step;
 import io.restassured.response.Response;
+import ru.stellar.model.User;
 import ru.stellar.util.AppConfig;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 
@@ -14,18 +12,12 @@ public class StellarApiClient {
     private static final String REGISTER = "/api/auth/register";
     private static final String USER = "/api/auth/user";
 
-    private final Gson gson = new Gson();
-
-    public String createUser(String email, String password, String name) {
-        Map<String, String> payload = new HashMap<>();
-        payload.put("email", email);
-        payload.put("password", password);
-        payload.put("name", name);
-
+    @Step("Создание пользователя через API с email={user.email}")
+    public String createUser(User user) {
         Response response = given()
                 .baseUri(AppConfig.getBaseUrl())
                 .contentType("application/json")
-                .body(gson.toJson(payload))
+                .body(user)
                 .when()
                 .post(REGISTER);
 
@@ -35,6 +27,7 @@ public class StellarApiClient {
         return null;
     }
 
+    @Step("Удаление пользователя через API")
     public void deleteUser(String accessToken) {
         if (accessToken == null) {
             return;
